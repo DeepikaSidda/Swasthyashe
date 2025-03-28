@@ -1,0 +1,818 @@
+{
+ "Resources": {
+  "Subscriptions1F71F6D8": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "email",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "KeySchema": [
+     {
+      "AttributeName": "email",
+      "KeyType": "HASH"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "SwasthyasheStack/Subscriptions/Resource"
+   }
+  },
+  "SubscriptionHandlerServiceRoleEB93C6F2": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SwasthyasheStack/SubscriptionHandler/ServiceRole/Resource"
+   }
+  },
+  "SubscriptionHandlerServiceRoleDefaultPolicy5CB31780": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchWriteItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "Subscriptions1F71F6D8",
+          "Arn"
+         ]
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "ses:SendEmail",
+        "ses:SendRawEmail"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "SubscriptionHandlerServiceRoleDefaultPolicy5CB31780",
+    "Roles": [
+     {
+      "Ref": "SubscriptionHandlerServiceRoleEB93C6F2"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SwasthyasheStack/SubscriptionHandler/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "SubscriptionHandlerAD1B68B4": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "6c0870aacbfddacb20d9126f238be0b42bb3563901900f7ad1d5c0312eb4e704.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "TABLE_NAME": {
+       "Ref": "Subscriptions1F71F6D8"
+      },
+      "NOTIFICATION_EMAIL": "siddadeepika@gmail.com"
+     }
+    },
+    "Handler": "subscription.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "SubscriptionHandlerServiceRoleEB93C6F2",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs18.x"
+   },
+   "DependsOn": [
+    "SubscriptionHandlerServiceRoleDefaultPolicy5CB31780",
+    "SubscriptionHandlerServiceRoleEB93C6F2"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SwasthyasheStack/SubscriptionHandler/Resource",
+    "aws:asset:path": "asset.6c0870aacbfddacb20d9126f238be0b42bb3563901900f7ad1d5c0312eb4e704",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "SwasthyasheApiABA8DD1D": {
+   "Type": "AWS::ApiGateway::RestApi",
+   "Properties": {
+    "Name": "Swasthyashe API"
+   },
+   "Metadata": {
+    "aws:cdk:path": "SwasthyasheStack/SwasthyasheApi/Resource"
+   }
+  },
+  "SwasthyasheApiCloudWatchRole3F6BA2C8": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "apigateway.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+       ]
+      ]
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "SwasthyasheStack/SwasthyasheApi/CloudWatchRole/Resource"
+   }
+  },
+  "SwasthyasheApiAccount165DC2B0": {
+   "Type": "AWS::ApiGateway::Account",
+   "Properties": {
+    "CloudWatchRoleArn": {
+     "Fn::GetAtt": [
+      "SwasthyasheApiCloudWatchRole3F6BA2C8",
+      "Arn"
+     ]
+    }
+   },
+   "DependsOn": [
+    "SwasthyasheApiABA8DD1D"
+   ],
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "SwasthyasheStack/SwasthyasheApi/Account"
+   }
+  },
+  "SwasthyasheApiDeployment33E6190A7b6a2e6c4c2ff2b191f6bc1470487803": {
+   "Type": "AWS::ApiGateway::Deployment",
+   "Properties": {
+    "Description": "Automatically created by the RestApi construct",
+    "RestApiId": {
+     "Ref": "SwasthyasheApiABA8DD1D"
+    }
+   },
+   "DependsOn": [
+    "SwasthyasheApiOPTIONSFDBE5357",
+    "SwasthyasheApisubscribeOPTIONSFF9BFFB6",
+    "SwasthyasheApisubscribePOST793E86B6",
+    "SwasthyasheApisubscribe8946D7CB"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SwasthyasheStack/SwasthyasheApi/Deployment/Resource"
+   }
+  },
+  "SwasthyasheApiDeploymentStageprod1F6B4E70": {
+   "Type": "AWS::ApiGateway::Stage",
+   "Properties": {
+    "DeploymentId": {
+     "Ref": "SwasthyasheApiDeployment33E6190A7b6a2e6c4c2ff2b191f6bc1470487803"
+    },
+    "RestApiId": {
+     "Ref": "SwasthyasheApiABA8DD1D"
+    },
+    "StageName": "prod"
+   },
+   "DependsOn": [
+    "SwasthyasheApiAccount165DC2B0"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SwasthyasheStack/SwasthyasheApi/DeploymentStage.prod/Resource"
+   }
+  },
+  "SwasthyasheApiOPTIONSFDBE5357": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Fn::GetAtt": [
+      "SwasthyasheApiABA8DD1D",
+      "RootResourceId"
+     ]
+    },
+    "RestApiId": {
+     "Ref": "SwasthyasheApiABA8DD1D"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SwasthyasheStack/SwasthyasheApi/Default/OPTIONS/Resource"
+   }
+  },
+  "SwasthyasheApisubscribe8946D7CB": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "SwasthyasheApiABA8DD1D",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "subscribe",
+    "RestApiId": {
+     "Ref": "SwasthyasheApiABA8DD1D"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SwasthyasheStack/SwasthyasheApi/Default/subscribe/Resource"
+   }
+  },
+  "SwasthyasheApisubscribeOPTIONSFF9BFFB6": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "SwasthyasheApisubscribe8946D7CB"
+    },
+    "RestApiId": {
+     "Ref": "SwasthyasheApiABA8DD1D"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SwasthyasheStack/SwasthyasheApi/Default/subscribe/OPTIONS/Resource"
+   }
+  },
+  "SwasthyasheApisubscribePOSTApiPermissionSwasthyasheStackSwasthyasheApiEC519D1FPOSTsubscribe100C5474": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SubscriptionHandlerAD1B68B4",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "SwasthyasheApiABA8DD1D"
+       },
+       "/",
+       {
+        "Ref": "SwasthyasheApiDeploymentStageprod1F6B4E70"
+       },
+       "/POST/subscribe"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SwasthyasheStack/SwasthyasheApi/Default/subscribe/POST/ApiPermission.SwasthyasheStackSwasthyasheApiEC519D1F.POST..subscribe"
+   }
+  },
+  "SwasthyasheApisubscribePOSTApiPermissionTestSwasthyasheStackSwasthyasheApiEC519D1FPOSTsubscribe74888EB4": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SubscriptionHandlerAD1B68B4",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "SwasthyasheApiABA8DD1D"
+       },
+       "/test-invoke-stage/POST/subscribe"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SwasthyasheStack/SwasthyasheApi/Default/subscribe/POST/ApiPermission.Test.SwasthyasheStackSwasthyasheApiEC519D1F.POST..subscribe"
+   }
+  },
+  "SwasthyasheApisubscribePOST793E86B6": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:",
+        {
+         "Ref": "AWS::Region"
+        },
+        ":lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "SubscriptionHandlerAD1B68B4",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "SwasthyasheApisubscribe8946D7CB"
+    },
+    "RestApiId": {
+     "Ref": "SwasthyasheApiABA8DD1D"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SwasthyasheStack/SwasthyasheApi/Default/subscribe/POST/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02OQU/DMAyFf8vumWGdNHHtQNwQU8d9chNTsrZJVTtUVZX/jpIObaf32c9+dgG7lwM8b3DirTbttrM1LGdB3Sqc+LKY2WHvTQ3LF9YdqddvlyGqDvvaICzvwWmx3iXrkU809pbZeheVxR6Wyq/7WU++s3rOc5mi4v0FmUkYyiSK93AMuiU5IpPCwTYoNOEMS0Us5WBz1h1LrX1wot5o6Pzck5PUfajOgk1+YIWK2IdRU47/IPnxJpk3+ndvRzLHeG/nH1OQdU2a+QwyBInKeUNw5affYgcHKDZXtnY7Bie2J6hW/QNLfHh3dAEAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "SwasthyasheStack/CDKMetadata/Default"
+   },
+   "Condition": "CDKMetadataAvailable"
+  }
+ },
+ "Outputs": {
+  "SwasthyasheApiEndpointCE16D896": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "SwasthyasheApiABA8DD1D"
+      },
+      ".execute-api.",
+      {
+       "Ref": "AWS::Region"
+      },
+      ".",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "SwasthyasheApiDeploymentStageprod1F6B4E70"
+      },
+      "/"
+     ]
+    ]
+   }
+  }
+ },
+ "Conditions": {
+  "CDKMetadataAvailable": {
+   "Fn::Or": [
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "af-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-3"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-4"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-northwest-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-2"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "il-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "sa-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-west-1"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Equals": [
+      {
+       "Ref": "AWS::Region"
+      },
+      "us-west-2"
+     ]
+    }
+   ]
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}
