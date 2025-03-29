@@ -21,7 +21,7 @@ Swasthyashe blends **ancient Ayurvedic wisdom** with **modern science** to empow
 ✅ **Amazon API Gateway:** Connecting the frontend with backend services securely.  
 ✅ **AWS IAM:** Managing secure access controls.  
 ✅ **Amazon CloudWatch:** Monitoring and logging application performance.  
-![Alt text](C:\Users\sidda\Downloads\lambda.jpg)
+
 
 ## 📂 Project Setup  
 ### 1️⃣ Clone the Repository  
