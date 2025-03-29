@@ -23,11 +23,23 @@ Swasthyashe blends **ancient Ayurvedic wisdom** with **modern science** to empow
 ✅ **Amazon CloudWatch:** Monitoring and logging application performance.  
 
 <p align="center">
-  <img src="images/lambda.jpg" alt="Lambda Function" width="450">
-  <img src="images/api.jpg" alt="Another Image" width="450">
+  <figure>
+    <img src="images/lambda.jpg" alt="Lambda Function" width="450">
+    <figcaption>Lambda Function</figcaption>
+  </figure>
+  <figure>
+    <img src="images/api.jpg" alt="Another Image" width="450">
+    <figcaption>API Gateway</figcaption>
+  </figure>
 </p>
 
- <img src="images/db.jpg" alt="Lambda Function" width="450">
+ <figure>
+    <img src="images/db.jpg" alt="Lambda Function" width="450">
+    <figcaption>Dynamo DB Table</figcaption>
+  </figure>
+
+
+
 
 
 ## 📂 Project Setup  
