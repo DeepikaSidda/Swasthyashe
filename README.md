@@ -22,8 +22,12 @@ Swasthyashe blends **ancient Ayurvedic wisdom** with **modern science** to empow
 ✅ **AWS IAM:** Managing secure access controls.  
 ✅ **Amazon CloudWatch:** Monitoring and logging application performance.  
 
-<img src="images/lambda.jpg" alt="Lambda Function" width="450">
+<p align="center">
+  <img src="images/lambda.jpg" alt="Lambda Function" width="450">
+  <img src="images/api.jpg" alt="Another Image" width="450">
+</p>
 
+ <img src="images/db.jpg" alt="Lambda Function" width="450">
 
 
 ## 📂 Project Setup  
