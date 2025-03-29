@@ -36,11 +36,13 @@ Swasthyashe blends **ancient Ayurvedic wisdom** with **modern science** to empow
 </table>
 
 
-
- <figure>
-    <img src="images/db.jpg" alt="Lambda Function" width="450">
-    <figcaption>Dynamo DB Table</figcaption>
+<div align="center">
+  <figure>
+    <img src="images/db.jpg" alt="DynamoDB Table" width="450">
+    <figcaption><b>DynamoDB Table</b></figcaption>
   </figure>
+</div>
+
 
 
 
